@@ -1,6 +1,6 @@
 import numpy as np
 from src.hcr import fit_lasso, make_density, calibrate_density
-from src.features import moment_like_features, target_features
+from src.features import moment_like_features, prepare_targets
 
 def mean_log_likelihood(V_test, y_test, models,
                         calibration_method = "softplus",
@@ -28,13 +28,7 @@ def evaluate_fold(
 ):
     V_train = moment_like_features(X_train, N)
     V_test  = moment_like_features(X_test, N)
-
-    targets_train = []
-    targets_test  = []
-
-    for n in range(1, N+1):
-        targets_train.append(target_features(y_train, n))
-        targets_test.append(target_features(y_test, n))
+    targets_train = prepare_targets(y_train, N)
 
     models = []
     for n in range(N):
@@ -48,6 +42,46 @@ def evaluate_fold(
     )
 
     return ll
+
+def relevance(
+        X_train, X_test,
+        y_train, y_test,
+        col, N, lambda_val,
+        calibration_method
+):
+    X_train_mod = X_train[[col]]
+    X_test_mod  = X_test[[col]]
+
+    return evaluate_fold(
+        X_train_mod, X_test_mod,
+        y_train, y_test,
+        N, lambda_val,
+        calibration_method
+    )
+
+def novelty(
+        X_train, X_test,
+        y_train, y_test,
+        col, N, lambda_val,
+        calibration_method
+):
+    X_train_mod = X_train.drop(columns=[col])
+    X_test_mod  = X_test.drop(columns=[col])
+
+    ll_base = evaluate_fold(
+        X_train, X_test,
+        y_train, y_test,
+        N, lambda_val,
+        calibration_method
+    )
+    ll_mod = evaluate_fold(
+        X_train_mod, X_test_mod,
+        y_train, y_test,
+        N, lambda_val,
+        calibration_method
+    )
+
+    return ll_mod-ll_base
 
 def expected_value(density, n_grid=1_000):
     grid = np.linspace(0, 1, n_grid)

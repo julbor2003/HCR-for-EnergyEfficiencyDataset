@@ -23,3 +23,11 @@ def target_features (Y, n):
 
     features = pd.DataFrame(features, index=Y.index)
     return features
+
+def prepare_targets (y, N):
+    targets = []
+
+    for n in range(1, N+1):
+        targets.append(target_features(y, n))
+
+    return targets
