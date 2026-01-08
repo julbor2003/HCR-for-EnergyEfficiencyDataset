@@ -24,6 +24,7 @@
   * `make_density`- uses regression-derived models to obtain a density function
   * `calibrate_density` - for calibrating raw density functions
 * `legendre.py` – provides the class `RescaledLegendre`, which implements an orthonormal basis of rescaled Legendre polynomials
+* `weights.py` – provides functions for analysing, reporting and ploting regresion model weights
 
 ## BASIC USAGE
 
@@ -41,11 +42,11 @@ The obtained *mean log-likelihood* on the test set is:
 * CL (calibration: *softplus*): **0.7556**
 * CL (calibration: *clip*): **0.9897**
 
-Additionally, the notebooks include an example of predicting the target variable as the expected value of the modeled distribution and reversing the normalization. At the end, evaluation using MSE on the test set is presented.
+Additionally, the notebooks include an example of predicting the target variable as the expected value of the modeled distribution and reversing the normalization. At the end, evaluation using MSE on the test set is presented and model weights analysis is conducted.
 
 ## 10-fold CV
 
-In the file `CV.ipynb`, the operations from `HL-basic.ipynb` and `CL-basic.ipynb` are repeated, but using cross-validation with a split into 10 folds.
+In the file `CV.ipynb`, almost all the operations from `HL-basic.ipynb` and `CL-basic.ipynb` are repeated, but using cross-validation with a split into 10 folds.
 
 The obtained results for `Heating Load`:
 
