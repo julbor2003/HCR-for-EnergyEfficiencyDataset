@@ -21,9 +21,10 @@ def group_coeffs(coefs):
 
     return grouped
 
-def print_coeffs(model, V):
-    coefs = analyze_weights(model, V)
-    coefs = group_coeffs(coefs)
+def print_coeffs(model=None, V=None, coefs=None):
+    if coefs==None:
+        coefs = analyze_weights(model, V)
+        coefs = group_coeffs(coefs)
     for deg, terms in coefs.items():
         sorted_terms = sorted(
             terms.items(), 
@@ -36,16 +37,24 @@ def print_coeffs(model, V):
             print(f"  {var}: {value:.4f}")  
         print()
 
-def plot_coeffs(model, V, target_deg=1, base_deg=1, colors=None):
-    coefs = analyze_weights(model, V)
-    coefs = group_coeffs(coefs)
+def plot_coeffs(model=None, V=None, coefs=None, target_deg=1, base_deg=1, colors=None):
+    if coefs==None:
+        coefs = analyze_weights(model, V)
+        coefs = group_coeffs(coefs)
     
     degs = sorted(coefs.keys())
     if colors is None or len(colors)<len(degs):
         colors = plt.cm.viridis_r([i/max(len(degs)-1, 1) for i in range(len(degs))])
     plt.rcParams["font.family"] = "Times New Roman"
 
-    _, ax = plt.subplots(figsize=(6, 0.4*len(V.columns)/len(degs)))
+    if V!=None:
+        length = len(V.columns)/len(degs)
+    elif coefs!=None:
+        length = len(coefs[base_deg])
+    else:
+        raise ValueError("Either V or coefs must be provided.")
+
+    _, ax = plt.subplots(figsize=(6, 0.4*length))
 
     base_terms = coefs[base_deg]
     base_terms_sorted = sorted(

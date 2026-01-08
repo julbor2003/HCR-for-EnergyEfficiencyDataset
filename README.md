@@ -46,7 +46,7 @@ Additionally, the notebooks include an example of predicting the target variable
 
 ## 10-fold CV
 
-In the file `CV.ipynb`, almost all the operations from `HL-basic.ipynb` and `CL-basic.ipynb` are repeated, but using cross-validation with a split into 10 folds.
+In the file `CV.ipynb`, all the operations from `HL-basic.ipynb` and `CL-basic.ipynb` are repeated, but using cross-validation with a split into 10 folds.
 
 The obtained results for `Heating Load`:
 

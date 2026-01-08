@@ -1,6 +1,7 @@
 import numpy as np
 from src.hcr import fit_lasso, make_density, calibrate_density
 from src.features import moment_like_features, prepare_targets
+from src.weights import analyze_weights, group_coeffs
 
 def mean_log_likelihood(V_test, y_test, models,
                         calibration_method = "softplus",
@@ -24,7 +25,8 @@ def evaluate_fold(
     X_train, X_test,
     y_train, y_test,
     N, lambda_val,
-    calibration_method
+    calibration_method,
+    return_coeffs=False
 ):
     V_train = moment_like_features(X_train, N)
     V_test  = moment_like_features(X_test, N)
@@ -40,8 +42,14 @@ def evaluate_fold(
         models,
         calibration_method=calibration_method
     )
-
-    return ll
+    if return_coeffs:
+        coeffs_dict = {}
+        for deg, model in enumerate(models, 1):
+            weights = analyze_weights(model, V_train)
+            coeffs_dict[deg] = group_coeffs(weights)
+        return ll, coeffs_dict
+    else:
+        return ll
 
 def relevance(
         X_train, X_test,

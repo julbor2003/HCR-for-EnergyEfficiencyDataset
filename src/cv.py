@@ -8,6 +8,7 @@ from src.evaluation import evaluate_fold, relevance, novelty
 def cross_validate(X, y, N=4, lambda_val=1e-3, n_splits=10, seed=44):
     kf = KFold(n_splits=n_splits, shuffle=True, random_state=seed)
     results = {"softplus": [], "clip": []}
+    coeffs_list = []
 
     for fold, (train_ids, test_ids) in enumerate(kf.split(X), 1):
         print(f"Fold {fold}")
@@ -18,17 +19,19 @@ def cross_validate(X, y, N=4, lambda_val=1e-3, n_splits=10, seed=44):
         y_train_norm, y_test_norm, _ = edf_normalize(y_train, y_test)
 
         for method in ["softplus", "clip"]:
-            ll = evaluate_fold(
+            ll, coeffs_dict = evaluate_fold(
                 X_train_norm, X_test_norm,
                 y_train_norm, y_test_norm,
                 N=N,
                 lambda_val=lambda_val,
-                calibration_method=method
+                calibration_method=method,
+                return_coeffs=True
             )
             results[method].append(ll)
             print(f"  {method}: {ll:.4f}")
-
-    return results
+        coeffs_list.append(coeffs_dict)
+        
+    return results, coeffs_list
 
 def cv_relevance(X, y, N=4, lambda_val=1e-3, n_splits=10, seed=44):
     kf = KFold(n_splits=n_splits, shuffle=True, random_state=seed)
