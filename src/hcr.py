@@ -28,20 +28,20 @@ def make_density(models, v):
     
     return density
 
-def softplus(z):
-    return np.log1p(np.exp(z))
+def softplus(z, a=1, b=1):
+    return np.log1p(np.exp(a*z)/b)/a
 
-def calibrate_density(density, method="softplus", eps=1e-6, n_grid=1_000):
+def calibrate_density(density, method="softplus", a=1, b=1, eps=1e-6, n_grid=1_000):
     grid = np.linspace(0, 1, n_grid)
     raw_vals = density(grid)
 
     if method == "softplus":
-        vals = softplus(raw_vals)
+        vals = softplus(raw_vals, a=a, b=b)
         area = np.trapz(vals, grid)
 
         def calibrate_density(y):
             p = density(y)
-            p = softplus(p)
+            p = softplus(p, a=a, b=b)
             return p/area
         
         return calibrate_density
@@ -60,7 +60,8 @@ def calibrate_density(density, method="softplus", eps=1e-6, n_grid=1_000):
     else:
         raise ValueError("method must be 'softplus' or 'clip'")
     
-def plot_density(density, y=None, method="softplus", raw=False):
+def plot_density(density, y=None, method="softplus", a=1, b=1, raw=False):
+    plt.rcParams["font.family"] = "Times New Roman"
     plt.figure(figsize=(6,4))
     xs = np.linspace(0, 1, 500)
 
@@ -68,7 +69,7 @@ def plot_density(density, y=None, method="softplus", raw=False):
     if raw==True:
         plt.plot(xs, ys, lw=2, color="orange", label="Raw density")
 
-    calibrated_density = calibrate_density(density, method=method)
+    calibrated_density = calibrate_density(density, method=method, a=a, b=b)
     ys = calibrated_density(xs)
     plt.plot(xs, ys, lw=2, color="green", label="Calibrated density")
 
@@ -91,13 +92,18 @@ def plot_density(density, y=None, method="softplus", raw=False):
     plt.grid(False)
     plt.show()
 
-def plot_example_densities(V_test, y_test, models, name="Example densities", method="softplus", seed=None, raw=False):
+def plot_example_densities(V_test, y_test, models, 
+                           name="Example densities", 
+                           method="softplus",
+                           a=1, b=1, eps=1e-6, 
+                           seed=None, raw=False, save=False):
     if seed is not None:
         np.random.seed(seed)
 
     n = len(V_test)
     ids = np.random.choice(n, size=16, replace=False)
 
+    plt.rcParams["font.family"] = "Times New Roman"
     fig, axes = plt.subplots(4, 4, figsize=(14, 14))
     axes = axes.ravel()
 
@@ -112,7 +118,8 @@ def plot_example_densities(V_test, y_test, models, name="Example densities", met
         if raw==True:
             ax.plot(xs, ys, lw=2, color="orange", label="Raw density")
 
-        calibrated_density = calibrate_density(density, method=method)
+        calibrated_density = calibrate_density(density, method=method, 
+                                               a=a, b=b, eps=eps)
         ys = calibrated_density(xs)
         ax.plot(xs, ys, lw=2, color="green", label="Calibrated density")
 
@@ -131,4 +138,8 @@ def plot_example_densities(V_test, y_test, models, name="Example densities", met
         
     fig.suptitle(name, fontsize=20)
     plt.tight_layout(rect=[0, 0, 1, 0.97])
-    plt.show()
+    if not save:
+        plt.show()
+    else:
+        plt.savefig(f"figures/{name}.png")
+        plt.close()

@@ -20,15 +20,13 @@ class RescaledLegendre:
     def __repr__(self):
         return f"RescaledLegendre(degree={self.degree})"
     
-def plot_rescaled_legendre(
-    polynomials,
-    x=None,
-    domain=(0, 1),
-    labels=None,
-    n_points=500,
-    title="Rescaled Legendre polynomials",
-    grid = False
-    ):
+def plot_rescaled_legendre(polynomials,
+                           x=None,
+                           domain=(0, 1),
+                           labels=None,
+                           n_points=500,
+                           title="Rescaled Legendre polynomials",
+                           grid = False):
 
     polynomials = list(polynomials)
     if len(polynomials) == 0:
@@ -38,7 +36,8 @@ def plot_rescaled_legendre(
     if labels is None:
         labels = [f"deg {p.degree}" for p in polynomials]
 
-    fig, ax = plt.subplots()
+    plt.rcParams["font.family"] = "Times New Roman"
+    _, ax = plt.subplots()
     for poly, label in zip(polynomials, labels):
         ax.plot(x, poly(x), label=label)
 

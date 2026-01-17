@@ -38,6 +38,7 @@ def col_denorm(col, edf_models):
     return denormalize
 
 def plot_hists(x, x_norm, name="", bins=50, grid=False):
+    plt.rcParams["font.family"] = "Times New Roman"
     _, axes = plt.subplots(1, 2, figsize=(10, 4), sharey=False)
 
     axes[0].hist(x, bins=bins, density=True)
@@ -52,6 +53,7 @@ def plot_hists(x, x_norm, name="", bins=50, grid=False):
     plt.show()
 
 def plot_raw_vs_norm(x, x_norm, name="", grid=False):
+    plt.rcParams["font.family"] = "Times New Roman"
     plt.figure(figsize=(5, 4))
     plt.scatter(x, x_norm, s=10, alpha=0.6)
     plt.title(name)
